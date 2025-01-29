@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" >
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Posting</a>
+         {% if 'uzytkownik' in session %}
+            <a href="{{ url_for('wyloguj') }}">Wylogowanie</a>
+        {% else %}
+            <a href="{{ url_for('logowanie') }}">Logowanie</a>
+            <a href="{{ url_for('rejestracja') }}">Rejestracja</a>
+        {% endif %}
+    </nav>
+    <div>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

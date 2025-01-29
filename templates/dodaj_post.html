@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Dodaj nowy post</h1>
+<form method="POST">
+    <button type="submit">Dodaj</button><br>
+    <label for="tresc">Treść:</label>
+    <textarea id="tresc" name="tresc" required></textarea><br>
+
+</form>
+{% endblock %}

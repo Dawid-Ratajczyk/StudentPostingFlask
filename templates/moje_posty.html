@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Posty  {{ session['uzytkownik'] }}</h1>
+
+{% if posty %}
+    {% for post in posty %}
+        <div style=
+        "border: 2px dashed blue;
+        padding: 20px; text-align: center;
+        max-width: 200px; ">
+            <p> {{ post.tresc }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>nie zrobiles zadnych postów</p>
+{% endif %}
+
+{% endblock %}
