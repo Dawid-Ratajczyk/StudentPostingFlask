@@ -8,6 +8,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.static_folder = 'assets'
 
 db = SQLAlchemy(app)
 
@@ -34,7 +35,7 @@ def index():
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
 def favicon():
-    return send_file('images/favicon..gif', mimetype='image/ico')
+    return send_file('assets/favicon.gif', mimetype='image/ico')
 
 @app.route('/rejestracja', methods=['GET', 'POST'])
 def rejestracja():
