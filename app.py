@@ -1,8 +1,10 @@
+import json
+from json import JSONDecodeError
 from pydoc import render_doc
 
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, abort
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy import column
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '123'
@@ -11,6 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.static_folder = 'assets'
 
 db = SQLAlchemy(app)
+API_SECURITY_TOKEN = 'foobar'
 
 
 class Uzytkownik(db.Model):
@@ -24,6 +27,9 @@ class Post(db.Model):
     autor_id = db.Column(db.Integer, db.ForeignKey('uzytkownik.id'))
     autor = db.relationship('Uzytkownik', backref=db.backref('posty', lazy=True))
 
+    def toDict(self):
+        return {"tresc": self.tresc, "id": self.id, "autorId": self.autor.id}
+
 
 with app.app_context():
     db.create_all()
@@ -33,7 +39,7 @@ def index():
     posty = Post.query.all()
     return render_template('index.html', posty=posty)
 
-@app.route('/favicon.ico', methods=['GET', 'POST'])
+@app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_file('assets/favicon.gif', mimetype='image/ico')
 
@@ -57,11 +63,10 @@ def rejestracja():
 @app.route('/logowanie', methods=['GET', 'POST'])
 def logowanie():
     if request.method == 'POST':
-        nazwa_uzytkownika = request.form['nazwa_uzytkownika']
-        haslo = request.form['haslo']
-        uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=nazwa_uzytkownika).first()
-        if uzytkownik and haslo:
-            session['uzytkownik'] = nazwa_uzytkownika
+        login = request.form['nazwa_uzytkownika']
+        user = Uzytkownik.query.filter_by(nazwa_uzytkownika=login).first()
+        if user and user.haslo == request.form['haslo']:
+            session['uzytkownik'] = login
             return redirect(url_for('index'))
 
     return render_template('logowanie.html')
@@ -71,6 +76,15 @@ def wyloguj():
     session.pop('uzytkownik', None)
     return redirect(url_for('index'))
 
+@app.route('/api/post',methods=['GET'])
+def all_posts():
+    if 'Authentication' not in request.headers:
+        abort(401, "No auth header")
+    if request.headers['Authentication'] != API_SECURITY_TOKEN:
+        abort(401, "Invalid token")
+    result = Post.query.all()
+    return [x.toDict() for x in result]
+
 @app.route('/dodaj_post', methods=['GET', 'POST'])
 def dodaj_post():
     if 'uzytkownik' not in session:
@@ -79,6 +93,11 @@ def dodaj_post():
 
     if request.method == 'POST':
         tresc = request.form['tresc']
+        try:
+            data_object = json.loads(tresc)
+            tresc = ",".join([str(x) for x in data_object.values()])
+        except JSONDecodeError:
+            pass
         uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=session['uzytkownik']).first()
         nowy_post = Post(tresc=tresc, autor=uzytkownik)
         db.session.add(nowy_post)
