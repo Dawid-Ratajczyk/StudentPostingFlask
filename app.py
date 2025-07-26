@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from pydoc import render_doc
+
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -29,6 +31,10 @@ with app.app_context():
 def index():
     posty = Post.query.all()
     return render_template('index.html', posty=posty)
+
+@app.route('/favicon.ico', methods=['GET', 'POST'])
+def favicon():
+    return send_file('images/favicon..gif', mimetype='image/ico')
 
 @app.route('/rejestracja', methods=['GET', 'POST'])
 def rejestracja():
