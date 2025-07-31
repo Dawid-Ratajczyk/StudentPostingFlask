@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Logowanie</h1>
-<form method="POST">
-    <label for="nazwa_uzytkownika">Nazwa użytkownika </label>
-    <input type="text" id="nazwa_uzytkownika" name="nazwa_uzytkownika" required> <br>
+<div class="formbox container mt-5 "style="width: 600px">
+    <h1>Logowanie</h1>
+<form method="POST" class="mt-4">
+  <div class="mb-3" >
+    <label for="nazwa_uzytkownika" class="form-label">Nazwa</label>
+    <input type="text" class="form-control" id="nazwa_uzytkownika" name="nazwa_uzytkownika" required>
+  </div>
 
-    <label for="haslo">Haslo </label>
-    <input type="password" id="haslo" name="haslo" required>  <br>
+  <div class="mb-3">
+    <label for="haslo" class="form-label">Hasło</label>
+    <input type="password" class="form-control" id="haslo" name="haslo" required>
+  </div>
 
-    <button type="submit">Zaloguj</button>
-
+  <button type="submit" class="btn btn-dark">Zaloguj</button>
 </form>
+</div>
 {% endblock %}

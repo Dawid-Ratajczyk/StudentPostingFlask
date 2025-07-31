@@ -1,11 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="formbox container mt-5" style="width: 600px" >
 <h1>Dodaj nowy post</h1>
-<form method="POST">
-    <button type="submit">Dodaj</button><br>
-    <label for="tresc">Treść:</label>
-    <textarea id="tresc" name="tresc" required></textarea><br>
 
+<form method="POST" enctype="multipart/form-data" class="mt-4">
+     <div class="mb-3">
+    <label for="tresc" class="form-label">Treść:</label>
+    <textarea class="form-control" id="tresc" name="tresc" rows="3" maxlength="200" required></textarea>
+    <div id="trescHelp" class="form-text">
+      Max 200 znaków (40 jeśli dodasz zdjęcie)
+    </div>
+    </div>
+
+     <div class="mb-3">
+         <label for="file" class="form-label">Zdjęcie</label>
+         <input class="form-control" type="file" id="file" name="file">
+     </div>
+    <hr class="my-4">
+    <button type="submit" class="btn btn-dark">Dodaj</button>
 </form>
+</div>
 {% endblock %}
+

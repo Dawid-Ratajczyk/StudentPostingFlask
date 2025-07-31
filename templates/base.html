@@ -1,25 +1,48 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:background-color="http://www.w3.org/1999/xhtml">
+<html lang="pl" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" >
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 </head>
-<body>
+<body class="bg-dark" style="color: white;">
+
     <nav style=
         "border: 2px solid black;
         padding: 5px; text-align: left;
         max-width: container-fluid; ">
-        <a href="{{ url_for('index') }}" style="background-color: gray; color: yellow">Posting</a>
+        <a href="{{ url_for('index') }}" >STRONA GŁÓWNA</a>
          {% if 'uzytkownik' in session %}
-            <a href="{{ url_for('wyloguj') }}" style="background-color: gray; color: red">Wylogowanie</a>
+            <a href="{{ url_for('wyloguj') }} ">WYLOGOWANIE</a>
         {% else %}
-            <a href="{{ url_for('logowanie') }}" style="background-color: gray; color: blue">Logowanie</a>
-            <a href="{{ url_for('rejestracja') }}"style="background-color: gray; color: blue">Rejestracja</a>
+            <a href="{{ url_for('logowanie') }}">LOGOWANIE</a>
+            <a href="{{ url_for('rejestracja') }}">REJESTRACJA</a>
         {% endif %}
     </nav>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
     <div>
         {% block content %}{% endblock %}
     </div>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);  // 5 seconds
+    });
+});
+</script>

@@ -4,16 +4,18 @@
 <h1>Posty  {{ session['uzytkownik'] }}</h1>
 
 {% if posty %}
+<div style=" display: flex;flex-wrap: wrap; gap: 15px;justify-content: flex-start;">
     {% for post in posty %}
-        <div style=
-        "border: 2px dashed blue;
-        padding: 20px; text-align: center;
-        max-width: 200px; ">
-            <p> {{ post.tresc }}</p>
-        </div>
+    <div class="post">
+        <div style="min-height:95px"class="post_tresc">{{ post.tresc }}</div>
+         {% if post.img %}
+        <img src="data:image/jpeg;base64,{{ post.img | b64encode }}" alt="Obraz posta" class="post_img">
+         {% endif %}
+    </div>
     {% endfor %}
+</div>
 {% else %}
-    <p>nie zrobiles zadnych postów</p>
+    <p>Nie zrobiles zadnych postów</p>
 {% endif %}
 
 {% endblock %}
