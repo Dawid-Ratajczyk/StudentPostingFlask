@@ -45,6 +45,12 @@ with app.app_context():
 def favicon():
     return send_file('static/favicon.gif', mimetype='image/ico')
 
+@app.after_request #Cache for static files and favicon
+def add_cache_header(response):
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
+
 @app.template_filter('b64encode')
 def base64_encode_filter(data):
     if data:
@@ -69,8 +75,10 @@ def rejestracja():
         haslo = request.form['haslo']
 
         if Uzytkownik.query.filter_by(nazwa_uzytkownika=nazwa_uzytkownika).first():
+            flash(message='Użytkownik już istnieje', category='warning')
             return redirect(url_for('rejestracja'))
 
+        flash(message='Rejestracja udana', category='succes')
         nowy_uzytkownik = Uzytkownik(nazwa_uzytkownika=nazwa_uzytkownika, haslo=haslo)
         db.session.add(nowy_uzytkownik)
         db.session.commit()
@@ -84,13 +92,15 @@ def logowanie():
         login = request.form['nazwa_uzytkownika']
         user = Uzytkownik.query.filter_by(nazwa_uzytkownika=login).first()
         if user and user.haslo == request.form['haslo']:
+            flash(message='Zalogowano', category='succes')
             session['uzytkownik'] = login
             return redirect(url_for('index'))
-
+    flash(message='Błędne dane',category='warning')
     return render_template('logowanie.html')
 
 @app.route('/wyloguj')
 def wyloguj():
+    flash(message='Wylogowano', category='succes')
     session.pop('uzytkownik', None)
     return redirect(url_for('index'))
 #Posty---------------------------------------------------
@@ -111,7 +121,7 @@ def dodaj_post():
 
         tresc = request.form['tresc']
         has_file = 'file' in request.files and request.files['file'].filename
-        max_length = 40 if has_file else 200
+        max_length = 48 if has_file else 220
 
         tresc=tresc[:max_length]
         try:
