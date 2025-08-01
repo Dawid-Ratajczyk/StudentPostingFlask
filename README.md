@@ -1,2 +1,2 @@
 Prosty web app 
-Deploy z aws: http://studentpost.eba-hbdhq6du.eu-central-1.elasticbeanstalk.com/
+Deploy z aws: http://studentposting.eu-central-1.elasticbeanstalk.com/
