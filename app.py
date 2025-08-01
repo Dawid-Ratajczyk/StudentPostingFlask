@@ -95,7 +95,7 @@ def logowanie():
             flash(message='Zalogowano', category='succes')
             session['uzytkownik'] = login
             return redirect(url_for('index'))
-    flash(message='Błędne dane',category='warning')
+        flash(message='Błędne dane',category='warning')
     return render_template('logowanie.html')
 
 @app.route('/wyloguj')
@@ -104,34 +104,26 @@ def wyloguj():
     session.pop('uzytkownik', None)
     return redirect(url_for('index'))
 #Posty---------------------------------------------------
-@app.route('/api/post',methods=['GET'])
+@app.route('/api/post',methods=['GET'])#Api for getting all the posts as json
 def all_posts():
-    if 'Authentication' not in request.headers:
-        abort(401, "No auth header")
-    if request.headers['Authentication'] != API_SECURITY_TOKEN:
-        abort(401, "Invalid token")
+    #if 'Authentication' not in request.headers:
+     #   abort(401, "No auth header")
+    #if request.headers['Authentication'] != API_SECURITY_TOKEN:
+    #    abort(401, "Invalid token")
     result = Post.query.all()
     return [x.toDict() for x in result]
 
-@app.route('/dodaj_post', methods=['GET', 'POST'])
+@app.route('/dodaj_post', methods=['GET', 'POST'])#Dodawanie postow
 def dodaj_post():
     if 'uzytkownik' not in session:
         return redirect(url_for('logowanie'))
     if request.method == 'POST':
 
         tresc = request.form['tresc']
+        #Jeśli ma zdjęcie to limit do 48 znakow
         has_file = 'file' in request.files and request.files['file'].filename
         max_length = 48 if has_file else 220
-
         tresc=tresc[:max_length]
-        try:
-            data_object = json.loads(tresc)
-            tresc = ",".join([str(x) for x in data_object.values()])
-            if len(tresc) > max_length:
-                tresc = tresc[:max_length]
-        except JSONDecodeError:
-            pass
-
         uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=session['uzytkownik']).first()
         nowy_post = Post(
             tresc=tresc,
@@ -169,3 +161,5 @@ def moje_posty():
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000)
     app.run(debug=False)
+
+

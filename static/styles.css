@@ -17,7 +17,7 @@ body {
 body:hover {
 
 }
-a {
+.btn {
   display: inline-block;
   font-weight: 400;
   text-align: center;
@@ -35,7 +35,8 @@ a {
   background-color: #212529;
 }
 
-a:hover {
+
+.btn:hover {
   background-color: #424649;
   text-decoration: none;
 }

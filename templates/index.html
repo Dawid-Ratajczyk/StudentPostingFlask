@@ -8,7 +8,7 @@
 <body>
 {% block content %}
 
-<h1>Warszawa Student Posting</h1>
+
 {% if 'uzytkownik' in session %}
     <p>Zalogowano jako: {{ session['uzytkownik'] }}</p>
     <a href="{{ url_for('dodaj_post') }}" >Dodaj post</a>
