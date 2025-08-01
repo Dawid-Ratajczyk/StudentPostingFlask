@@ -16,16 +16,18 @@
 {% endif %}
 
 <h2>Posty Studentów</h2>
-<div style=" display: flex;flex-wrap: wrap; gap: 15px;justify-content: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start;">
     {% for post in posty %}
-    <div class="post">
+    <div class="post" onclick="this.classList.toggle('expanded')">
         <div class="post_autor"><strong>{{ post.autor.nazwa_uzytkownika }}</strong></div>
         <div class="post_tresc">{{ post.tresc }}</div>
-         {% if post.img %}
+        {% if post.img %}
         <img src="data:image/jpeg;base64,{{ post.img | b64encode }}" alt="Obraz posta" class="post_img">
-         {% endif %}
+
+        {% endif %}
     </div>
     {% endfor %}
 </div>
 </body>
 {% endblock %}
+

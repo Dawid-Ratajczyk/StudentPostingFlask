@@ -28,7 +28,7 @@ class Uzytkownik(db.Model):
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    tresc = db.Column(db.Text(100))
+    tresc = db.Column(db.Text(350))
     autor_id = db.Column(db.Integer, db.ForeignKey('uzytkownik.id'))
     autor = db.relationship('Uzytkownik', backref=db.backref('posty', lazy=True))
     img = db.Column(db.Text)
@@ -122,7 +122,7 @@ def dodaj_post():
         tresc = request.form['tresc']
         #Jeśli ma zdjęcie to limit do 48 znakow
         has_file = 'file' in request.files and request.files['file'].filename
-        max_length = 48 if has_file else 220
+        max_length = 80 if has_file else 350
         tresc=tresc[:max_length]
         uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=session['uzytkownik']).first()
         nowy_post = Post(

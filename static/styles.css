@@ -34,33 +34,23 @@ body:hover {
   border: 3px solid purple !important;
   background-color: #212529;
 }
-
-
 .btn:hover {
   background-color: #424649;
   text-decoration: none;
 }
-
 a:active,
 a:focus {
   box-shadow: 0 0 0 0.25rem rgba(128, 0, 128, 0.25);
-}
-.post {
-background-color: #343a40;
-border: 5px solid purple;
-text-align: left;
-width: 200px;
-height: 295px;
-lex-shrink: 0;
 }
 .post_tresc {
 padding: 5px;
 min-height: 62px;
 }
 .post_img {
-width: 190px;
+width: 200px;
 height: 190px;
 text-align: center;
+display: block; margin-left: auto; margin-right: auto;"
 }
 .post_autor {
 text-align: center;
@@ -88,10 +78,13 @@ display: inline-block;
 border: 3px solid purple;
 padding: 15px;
 }
-.border-purple {
-       border: 2px solid #6f42c1 !important;
-       border-radius: 0.5rem;
-    }
-    .bg-purple {
-        background-color: #6f42c1 !important;
+.post {
+        border: 1px solid #444;
+        padding: 0px;
+        border-radius: 8px;
+        width: 300px;
+        cursor: pointer;
+        background-color: #2d3338;
+        color: #e9ecef;
+        overflow: hidden;
     }
