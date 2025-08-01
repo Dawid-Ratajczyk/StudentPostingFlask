@@ -7,8 +7,6 @@
 </head>
 <body>
 {% block content %}
-
-
 {% if 'uzytkownik' in session %}
     <p>Zalogowano jako: {{ session['uzytkownik'] }}</p>
     <a href="{{ url_for('dodaj_post') }}" class="btn">Dodaj post</a>

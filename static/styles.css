@@ -9,10 +9,6 @@ body {
   --bs-link-hover-color: white; /
   --bs-link-color: #6f42c1;
   color: #212529;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                         Helvetica, Arial, sans-serif, "Apple Color Emoji",
-                         "Segoe UI Emoji", "Segoe UI Symbol";
-            line-height: 1.5;
 }
 body:hover {
 
@@ -88,3 +84,29 @@ padding: 15px;
         color: #e9ecef;
         overflow: hidden;
     }
+    .post.expanded {
+    transform: scale(2);
+    background-color: #2d3338;
+    border: 1px solid #444;
+    padding: 0px;
+    border-radius: 8px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    font-size: 2em;
+}
+.post.expanded img {
+    text-align:center;
+    transform: scale(1); /* Scale images up */
+    transform-origin: center;
+    margin: 15px 0;
+    width: 600px;
+height: 600px;
+text-align: center;
+display: block; margin-left: auto; margin-right: auto;"
+}

@@ -1,5 +1,6 @@
 import io
 import json
+import os
 from base64 import b64encode
 from json import JSONDecodeError
 from pydoc import render_doc
@@ -17,6 +18,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.static_folder = 'static'
 #Database--------------------------------------------------------
+db_path = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'data.db'))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 db = SQLAlchemy(app)
 API_SECURITY_TOKEN = 'foobar'
 
