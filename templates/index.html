@@ -7,11 +7,6 @@
 </head>
 <body>
 {% block content %}
-{% if 'uzytkownik' in session %}
-    <p>Zalogowano jako: {{ session['uzytkownik'] }}</p>
-    <a href="{{ url_for('dodaj_post') }}" class="btn">Dodaj post</a>
-    <a href="{{ url_for('moje_posty') }}" class="btn">Moje posty</a>
-{% endif %}
 
 <h2>Posty Studentów</h2>
 <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start;">

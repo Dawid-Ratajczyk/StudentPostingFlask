@@ -12,13 +12,19 @@
 <body class="bg-dark" style="color: white;display: flex; flex-direction: column; min-height: 100vh;">
 
     <nav style="border: 2px solid black;  padding: 5px; text-align: left;max-width: container-fluid; ">
-        <img src="static/favicon.ico"> WARSZAWA STUDENT POSTING
+        <div style="font-size: 3em;"><img src="static/favicon.ico"> WARSZAWA STUDENT POSTING</div> <br>
+                {% if 'uzytkownik' in session %}Zalogowano jako: {{ session['uzytkownik'] }}{% endif %}<br>
         <a href="{{ url_for('index') }}" class="btn">STRONA GŁÓWNA</a>
          {% if 'uzytkownik' in session %}
             <a href="{{ url_for('wyloguj') }} "class="btn">WYLOGOWANIE</a>
         {% else %}
             <a href="{{ url_for('logowanie') }}"class="btn">LOGOWANIE</a>
             <a href="{{ url_for('rejestracja') }}"class="btn">REJESTRACJA</a>
+        {% endif %}
+
+        {% if 'uzytkownik' in session %}
+            <a href="{{ url_for('dodaj_post') }}" class="btn">Dodaj post</a>
+            <a href="{{ url_for('moje_posty') }}" class="btn">Moje posty</a>
         {% endif %}
 
     </nav>
