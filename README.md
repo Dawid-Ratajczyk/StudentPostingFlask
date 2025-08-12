@@ -1,2 +1,5 @@
-Prosty web app 
-Deploy z aws: http://studentposting.eu-central-1.elasticbeanstalk.com/
+# Student Posting
+
+URL: https://studentposting.pl/
+
+JSON API: `GET https://studentposting.pl/api/post`
