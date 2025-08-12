@@ -9,4 +9,5 @@
 /.idea/aws.xml
 /__pycache__/
 /aws-elastic-beanstalk-cli-setup/
-
+/instance/data.db
+instance/data.db

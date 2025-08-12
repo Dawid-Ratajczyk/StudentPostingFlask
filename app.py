@@ -13,12 +13,12 @@ from sqlalchemy import column
 app = Flask(__name__)
 app.debug=False
 app.config['SECRET_KEY'] = '123'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.static_folder = 'static'
 #Database--------------------------------------------------------
-db_path = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'data.db'))
+db_path = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'instance/data.db'))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 db = SQLAlchemy(app)
 API_SECURITY_TOKEN = 'foobar'
@@ -28,6 +28,7 @@ class Uzytkownik(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nazwa_uzytkownika = db.Column(db.String(20), unique=True)
     haslo = db.Column(db.String(20))
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +64,7 @@ def base64_encode_filter(data):
 
 @app.route('/')
 def index():
-    posty = Post.query.all()
+    posty = Post.query.order_by(Post.id.desc()).all()
     return render_template('index.html', posty=posty)
 
 @app.route('/styles.css')
