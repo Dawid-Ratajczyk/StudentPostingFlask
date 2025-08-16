@@ -1,17 +1,9 @@
 {% extends 'base.html' %}
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="10">
-    <title>Bootstrap demo</title>
-</head>
-<body>
 {% block content %}
-
 <h2>Posty Studentów</h2>
 <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start;">
     {% for post in posty %}
-    <div class="post" onclick="this.classList.toggle('expanded')">
+    <div class="post">
         <div class="post_autor"><strong>{{ post.autor.nazwa_uzytkownika }}</strong></div>
         <div class="post_tresc">{{ post.tresc }}</div>
         {% if post.img %}
@@ -20,6 +12,20 @@
     </div>
     {% endfor %}
 </div>
-</body>
+<script>
+    const posts = document.querySelectorAll('.post');
+    // Add click event listener to each post
+    posts.forEach(function (p) {
+        p.addEventListener('click', function (event) {
+            // Clear expanded class from all posts
+            posts.forEach(function (p) {
+                if (p !== event.currentTarget) {
+                    p.classList.remove('expanded');
+                }
+            })
+            // Toggle class to the clicked post
+            event.currentTarget.classList.toggle('expanded');
+        });
+    });
+</script>
 {% endblock %}
-
