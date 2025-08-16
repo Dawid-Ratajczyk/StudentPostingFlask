@@ -7,7 +7,7 @@
         <div class="post_autor"><strong>{{ post.autor.nazwa_uzytkownika }}</strong></div>
         <div class="post_tresc">{{ post.tresc }}</div>
         {% if post.img %}
-        <img src="/picture/{{ post.id }}" alt="Obraz posta" class="post_img">
+        <img src="/picture/{{ post.id }}-media.{{ post.img_name | replace('/', '.') }}" alt="Obraz posta" class="post_img">
         {% endif %}
     </div>
     {% endfor %}
