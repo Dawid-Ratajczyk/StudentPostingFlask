@@ -147,8 +147,9 @@ def dodaj_post():
 def picture(post_id):
     post = Post.query.get_or_404(post_id)
     img = io.BytesIO(post.img)
-    return send_file(img,mimetype=post.img_name)
-
+    response = send_file(img, mimetype=post.img_name)
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 @app.route('/moje_posty')
 def moje_posty():
