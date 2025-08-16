@@ -28,24 +28,24 @@
         {% endif %}
 
     </nav>
-
-
     <main style="flex: 1;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container mt-5">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <div>
         {% block content %}{% endblock %}
         </div>
     </main>
     <footer class="bg-dark text-white py-4 mt-5">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
     <div class="container text-center">
         <p>&copy; 2025 Dawid Ratajczyk. <a href="/api/post" style="color: gray;">All posts</a></p>
     </div>
