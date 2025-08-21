@@ -39,8 +39,10 @@ class Post(db.Model):
     img_name = db.Column(db.Text)
 
     def toDict(self):
-        return {"tresc": self.tresc, "id": self.id, "autorId": self.autor.id}
-
+        content = {"content": self.tresc, "id": self.id, "autorId": self.autor.id}
+        if self.img:
+            content["mediaUrl"] = f"/picture/{self.id}-media.{self.img_name.replace('/', '.')}"
+        return content
 
 with app.app_context():
     db.create_all()
@@ -143,12 +145,13 @@ def dodaj_post():
     return render_template('dodaj_post.html')
 
 
-@app.route('/picture/<int:post_id>')
-def picture(post_id):
-    post = Post.query.get_or_404(post_id)
+@app.route('/picture/<string:fake_img_id>')  # Endpoint for serving images
+def picture(fake_img_id):
+    post = Post.query.get_or_404(int(fake_img_id.split('-media')[0]))
     img = io.BytesIO(post.img)
-    return send_file(img,mimetype=post.img_name)
-
+    response = send_file(img, mimetype=post.img_name)
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 @app.route('/moje_posty')
 def moje_posty():
