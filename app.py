@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash, \
     send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-
+load_dotenv()
 from ai import prompt_img
 
-load_dotenv()
+
 app = Flask(__name__)
 app.debug=False
 app.config['SECRET_KEY'] = '123'
