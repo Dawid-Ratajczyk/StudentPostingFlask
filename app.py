@@ -2,6 +2,7 @@ import base64
 import io
 import logging
 import os
+import sqlite3
 from base64 import b64encode
 
 from PIL import Image
@@ -118,8 +119,10 @@ def base64_encode_filter(data):
 
 @app.route("/")
 def index():
+    description_update()
     posty = Post.query.order_by(Post.id.desc()).all()
     opisy = Desc.query.order_by(Desc.id.desc()).all()
+
     return render_template("index.html", posty=posty, opisy=opisy)
 
 
@@ -154,6 +157,7 @@ def logowanie():
         login = request.form["nazwa_uzytkownika"]
         user = Uzytkownik.query.filter_by(nazwa_uzytkownika=login).first()
         if user and user.haslo == request.form["haslo"]:
+            app.logger.info(f"Logged by: {user}")
             flash(message="Zalogowano", category="succes")
             session["uzytkownik"] = login
             return redirect(url_for("index"))
@@ -169,6 +173,29 @@ def wyloguj():
 
 
 # Posty---------------------------------------------------
+def description_update():
+    posty = sqlite3.connect('instance/data.db')
+    descy = sqlite3.connect('instance/desc.db')
+    cursor1 = posty.cursor()
+    cursor2 = descy.cursor()
+    cursor1.execute("SELECT id,img,tresc from post")
+    cursor2.execute("SELECT id FROM desc")
+    list2=[]
+    for row2 in cursor2:
+         list2.append(row2[0])
+
+    for row1 in cursor1:
+        if row1[0] not in list2:
+            app.logger.info(f"Making post description id {row1[0]}")
+            nowy_desc = Desc(
+                id=row1[0],
+                desc=prompt_img(
+                    base64.b64encode(row1[1]).decode(), row1[2], app.logger
+                ),
+            )
+            db.session.add(nowy_desc)
+            db.session.commit()
+
 @app.route("/api/post", methods=["GET"])  # Api for getting all the posts as json
 def all_posts():
     # if 'Authentication' not in request.headers:
@@ -192,6 +219,7 @@ def dodaj_post():
         tresc = tresc[:max_length]
         picture = request.files["file"].stream.read()
         last_id = Post.query.count() + 1
+
         try:
             if picture:
                 nowy_desc = Desc(
@@ -215,6 +243,7 @@ def dodaj_post():
             img_name=request.files["file"].content_type,
         )
         db.session.add(nowy_post)
+        app.logger.info(f"Adding post by: {uzytkownik}")
         db.session.commit()
         flash(message="Dodano Post", category="success")
         return redirect(url_for("index"))
@@ -269,3 +298,4 @@ def force_resize_blob(
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
     app.run(debug=False)
+

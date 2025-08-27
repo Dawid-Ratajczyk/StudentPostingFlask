@@ -31,7 +31,7 @@ def create_data_uri(base64_str, image_type="jpeg"):
 
 
 def prompt_img(img, tresc, logger):
-    logger.info(f"Running prompt {tresc}")
+    #logger.info(f"Running prompt {tresc}")
     zapytanie = f"Wciel się w patologicznego studenta z warszawy. Masz humorystycznie odpowiedzieć na post z treści:{tresc}, i zdjęcia. Celuj w 150 liter. Nie kopiuj treści do odpowiedzi, tylko się odnieś do niej i zdjęcia. Jeśli jest to śmieszne i odnosi sie do posta możesz udawać studenta specyficznego kierunku"
     url = "https://api.openai.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
@@ -53,7 +53,7 @@ def prompt_img(img, tresc, logger):
     }
 
     response = requests.post(url, headers=headers, json=data)
-    logger.info(f"Result status code: {response.status_code}, Text: {response.text}")
+    #logger.info(f"Result status code: {response.status_code}, Text: {response.text}")
     if response.status_code == 200:
         result = response.json()
         # print(response.text)
