@@ -1,18 +1,18 @@
 import base64
 import io
-import json
+import logging
 import os
 from base64 import b64encode
-from json import JSONDecodeError
-from pydoc import render_doc
 
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, abort, flash, \
-    send_from_directory, make_response
-import logging
-from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash, \
+    send_from_directory
+from flask_sqlalchemy import SQLAlchemy
+
 from ai import prompt_img
 
+load_dotenv()
 app = Flask(__name__)
 app.debug=False
 app.config['SECRET_KEY'] = '123'
@@ -165,7 +165,7 @@ def dodaj_post():
                 )
                 db.session.add(nowy_desc)
         except Exception as e:
-            print(e)
+            app.logger.exception(e)
 
         picture= force_resize_blob(picture,900,900)
         uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=session['uzytkownik']).first()
