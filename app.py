@@ -71,6 +71,15 @@ class Desc(db.Model):
 with app.app_context():
     db.create_all()
 #Site---------------------------------------------------------------
+class IgnoreEndpointFilter(logging.Filter):
+    def filter(self, record):
+        # record.msg contains request line, e.g. "127.0.0.1 - - [..] "GET /healthz HTTP/1.1" 200 -"
+        # You can check against request path here
+        return "/picture" not in record.getMessage()
+
+log = logging.getLogger("werkzeug")
+log.addFilter(IgnoreEndpointFilter())
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return send_file('static/favicon.gif', mimetype='image/ico')
