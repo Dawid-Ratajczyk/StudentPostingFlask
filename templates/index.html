@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-<head>
+<head xmlns="http://www.w3.org/1999/html">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="refresh" content="10">
@@ -13,13 +13,28 @@
     {% for post in posty %}
     <div class="post" onclick="this.classList.toggle('expanded')">
         <div class="post_autor"><strong>{{ post.autor.nazwa_uzytkownika }}</strong></div>
+
         <div class="post_tresc">{{ post.tresc }}</div>
-        {% if post.img %}
-        <img src="/picture/{{ post.id }}" alt="Obraz posta" class="post_img">
-        {% endif %}
+        <div style="display:flex;">
+            {% if post.img %}
+                <img src="/picture/{{ post.id }}" alt="Obraz posta" class="post_img" >
+            {% endif %}
+            {% for opis in opisy %}
+                {% if opis.id == post.id %}
+                <p>
+                    Opinia Studenta:<br>
+                   {{opis.desc}}
+                </p>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+
     </div>
     {% endfor %}
 </div>
+
 </body>
+
 {% endblock %}
 

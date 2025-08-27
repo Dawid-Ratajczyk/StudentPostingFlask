@@ -1,3 +1,4 @@
+import base64
 import io
 import json
 import os
@@ -8,7 +9,8 @@ from pydoc import render_doc
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, abort, flash, \
     send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import column
+from PIL import Image
+from ai import prompt_img
 
 app = Flask(__name__)
 app.debug=False
@@ -17,20 +19,27 @@ app.config['SECRET_KEY'] = '123'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.static_folder = 'static'
+
 #Database--------------------------------------------------------
 db_path = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'instance/data.db'))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_BINDS'] = {
+    'data': 'sqlite:///data.db',
+    'desc': 'sqlite:///desc.db'
+}
 db = SQLAlchemy(app)
 API_SECURITY_TOKEN = 'foobar'
 
 
 class Uzytkownik(db.Model):
+    __tablename__ = 'uzytkownik'
     id = db.Column(db.Integer, primary_key=True)
     nazwa_uzytkownika = db.Column(db.String(20), unique=True)
     haslo = db.Column(db.String(20))
 
 
 class Post(db.Model):
+    __tablename__ = 'post'
     id = db.Column(db.Integer, primary_key=True)
     tresc = db.Column(db.Text(350))
     autor_id = db.Column(db.Integer, db.ForeignKey('uzytkownik.id'))
@@ -39,7 +48,15 @@ class Post(db.Model):
     img_name = db.Column(db.Text)
 
     def toDict(self):
-        return {"tresc": self.tresc, "id": self.id, "autorId": self.autor.id}
+        return {"tresc": self.tresc, "id": self.id, "autorId": self.autor.id, "img": base64.b64encode(self.img).decode()}
+
+class Desc(db.Model):
+    __bind_key__ = 'desc'
+    __tablename__ = 'desc'
+    id = db.Column(db.Integer, primary_key=True)
+    desc = db.Column(db.Text(200))
+
+
 
 
 with app.app_context():
@@ -65,7 +82,8 @@ def base64_encode_filter(data):
 @app.route('/')
 def index():
     posty = Post.query.order_by(Post.id.desc()).all()
-    return render_template('index.html', posty=posty)
+    opisy = Desc.query.order_by(Desc.id.desc()).all()
+    return render_template('index.html', posty=posty,opisy=opisy)
 
 @app.route('/styles.css')
 def serve_css():
@@ -128,11 +146,24 @@ def dodaj_post():
         has_file = 'file' in request.files and request.files['file'].filename
         max_length = 80 if has_file else 350
         tresc=tresc[:max_length]
+        picture = request.files['file'].stream.read()
+        last_id=Post.query.count()+1
+        try:
+            if picture:
+                nowy_desc = Desc(
+                    id=last_id,
+                    desc= prompt_img(base64.b64encode(picture).decode(),tresc)
+                )
+                db.session.add(nowy_desc)
+        except Exception as e:
+            print(e)
+
+        picture= force_resize_blob(picture,900,900)
         uzytkownik = Uzytkownik.query.filter_by(nazwa_uzytkownika=session['uzytkownik']).first()
         nowy_post = Post(
             tresc=tresc,
             autor_id=uzytkownik.id,
-            img = request.files['file'].stream.read(),
+            img = picture,
             img_name = request.files['file'].content_type
         )
         db.session.add(nowy_post)
@@ -160,6 +191,20 @@ def moje_posty():
     posty = Post.query.filter_by(autor_id=uzytkownik.id).all()
 
     return render_template('moje_posty.html', posty=posty)
+#Image--------------------------------------------------
+
+def force_resize_blob(blob_data, target_width, target_height,):
+    image = Image.open(io.BytesIO(blob_data))
+    resized_image = image.resize((target_width, target_height), )
+    output_blob = io.BytesIO()
+
+    if image.format and image.format.upper() in ['PNG', 'GIF', 'BMP', 'TIFF']:
+        resized_image.save(output_blob, format=image.format)
+    else:
+        resized_image.save(output_blob, format='JPEG', quality=95)
+
+    return output_blob.getvalue()
+
 
 #Main---------------------------------------------------
 if __name__ == "__main__":
