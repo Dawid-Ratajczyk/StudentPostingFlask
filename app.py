@@ -8,6 +8,7 @@ from pydoc import render_doc
 
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, abort, flash, \
     send_from_directory, make_response
+import logging
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 from ai import prompt_img
@@ -19,6 +20,14 @@ app.config['SECRET_KEY'] = '123'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.static_folder = 'static'
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
 
 #Database--------------------------------------------------------
 db_path = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'instance/data.db'))
@@ -152,7 +161,7 @@ def dodaj_post():
             if picture:
                 nowy_desc = Desc(
                     id=last_id,
-                    desc= prompt_img(base64.b64encode(picture).decode(),tresc)
+                    desc= prompt_img(base64.b64encode(picture).decode(),tresc,app.logger)
                 )
                 db.session.add(nowy_desc)
         except Exception as e:
