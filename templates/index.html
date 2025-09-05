@@ -19,14 +19,9 @@
             {% if post.img %}
                 <img src="/picture/{{ post.id }}" alt="Obraz posta" class="post_img" >
             {% endif %}
-            {% for opis in opisy %}
-                {% if opis.id == post.id %}
-                <p>
-                    Opinia Studenta:<br>
-                   {{opis.desc}}
-                </p>
-            {% endif %}
-            {% endfor %}
+            <p>
+                Opinia Studenta:<br> {{opisy.get(post.id, post.tresc)}}
+            </p>
         </div>
 
 

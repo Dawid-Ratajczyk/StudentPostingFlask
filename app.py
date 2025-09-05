@@ -79,6 +79,7 @@ class Desc(db.Model):
     __bind_key__ = "desc"
     __tablename__ = "desc"
     id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer)
     desc = db.Column(db.Text(200))
 
 
@@ -119,9 +120,8 @@ def base64_encode_filter(data):
 
 @app.route("/")
 def index():
-    description_update()
     posty = Post.query.order_by(Post.id.desc()).all()
-    opisy = Desc.query.order_by(Desc.id.desc()).all()
+    opisy = {d.post_id: d.desc for d in Desc.query.order_by(Desc.id.desc()).all()}
 
     return render_template("index.html", posty=posty, opisy=opisy)
 
@@ -174,15 +174,15 @@ def wyloguj():
 
 # Posty---------------------------------------------------
 def description_update():
-    posty = sqlite3.connect('instance/data.db')
-    descy = sqlite3.connect('instance/desc.db')
+    posty = sqlite3.connect("instance/data.db")
+    descy = sqlite3.connect("instance/desc.db")
     cursor1 = posty.cursor()
     cursor2 = descy.cursor()
     cursor1.execute("SELECT id,img,tresc from post")
     cursor2.execute("SELECT id FROM desc")
-    list2=[]
+    list2 = []
     for row2 in cursor2:
-         list2.append(row2[0])
+        list2.append(row2[0])
 
     for row1 in cursor1:
         if row1[0] not in list2:
@@ -195,6 +195,10 @@ def description_update():
             )
             db.session.add(nowy_desc)
             db.session.commit()
+    # Migrate existing desc to use post_id instead of id as foreign key
+    cursor2.execute("UPDATE desc SET post_id = id WHERE post_id IS NULL")
+    descy.commit()
+
 
 @app.route("/api/post", methods=["GET"])  # Api for getting all the posts as json
 def all_posts():
@@ -218,12 +222,27 @@ def dodaj_post():
         max_length = 80 if has_file else 350
         tresc = tresc[:max_length]
         picture = request.files["file"].stream.read()
-        last_id = Post.query.count() + 1
 
+        picture = force_resize_blob(picture, 900, 900)
+        uzytkownik = Uzytkownik.query.filter_by(
+            nazwa_uzytkownika=session["uzytkownik"]
+        ).first()
+
+        # Create Post first to get ID
+        nowy_post = Post(
+            tresc=tresc,
+            autor_id=uzytkownik.id,
+            img=picture,
+            img_name=request.files["file"].content_type,
+        )
+        db.session.add(nowy_post)
+        db.session.commit()
+
+        # Optionally create AI description
         try:
             if picture:
                 nowy_desc = Desc(
-                    id=last_id,
+                    post_id=nowy_post.id,
                     desc=prompt_img(
                         base64.b64encode(picture).decode(), tresc, app.logger
                     ),
@@ -232,17 +251,6 @@ def dodaj_post():
         except Exception as e:
             app.logger.exception(e)
 
-        picture = force_resize_blob(picture, 900, 900)
-        uzytkownik = Uzytkownik.query.filter_by(
-            nazwa_uzytkownika=session["uzytkownik"]
-        ).first()
-        nowy_post = Post(
-            tresc=tresc,
-            autor_id=uzytkownik.id,
-            img=picture,
-            img_name=request.files["file"].content_type,
-        )
-        db.session.add(nowy_post)
         app.logger.info(f"Adding post by: {uzytkownik}")
         db.session.commit()
         flash(message="Dodano Post", category="success")
@@ -296,6 +304,7 @@ def force_resize_blob(
 
 # Main---------------------------------------------------
 if __name__ == "__main__":
+    # Run data updates at startup
+    description_update()
     app.run(host="0.0.0.0", port=5000)
     app.run(debug=False)
-
